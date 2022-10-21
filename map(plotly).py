@@ -13,8 +13,9 @@ def km_to_mile(km):
 
 
 # coords = [lon, lat]
+# mongodb의 geometry 쿼리를 이용하여 중심 좌표 일정 반경내 도큐먼트들 가져오기
 def _get_map(collection, coords, distance):
-    client = MongoClient("mongodb://team01:1234@54.248.183.216", 27017)
+    client = MongoClient("mongodb://{id}:{pw}@{ip}", 27017)
     db = client['pjt2']
     coll = db[collection]
     dist = km_to_mile(distance) / 3963.2
@@ -26,19 +27,21 @@ def _get_map(collection, coords, distance):
             }
         }
     }, {'_id': 0})
+    # 커서에 담겨온 도큐먼트들 하나씩 빼내기
     for doc in cursor:
         # if len(doc['location']['coordinates'][0])
         doc['lon'] = doc['location']['coordinates'][0]
         doc['lat'] = doc['location']['coordinates'][1]
         del doc['location']
         collection_list.append(doc)
+    # plotly의 px.scatter_mapbox를 사용하기 위해 가져온 도큐먼트들은 데이터프레임으로 변경
     df = pd.DataFrame(collection_list)
 
     return df
 
-
+# 1~3위 대여소 리스트 뽑기위한 함수
 def ranking():
-    client = MongoClient("mongodb://team01:1234@54.248.183.216", 27017)
+    client = MongoClient("mongodb://{id}:{pw}@{ip}", 27017)
     db = client['pjt2']
     bike_station = db['BIKE_STATION']
     id_list = ['207', '502', '2715']
@@ -53,12 +56,12 @@ def ranking():
 
     return info_list
 
-
+# 교통시설 지도
 def transportation_facility(request):
     # 교통시설 : BUS_STATION / SUBWAY_STATION / BIKE_ROAD
     rank_list = ranking()
     center = [rank_list[0]['coords'], rank_list[1]['coords'], rank_list[2]['coords']]
-    mapboxt = open("C:\workspaces\project_2\Project_Engineering\seoul_bike\seoul_bike\mapbox_token.py").read().rstrip()
+    mapboxt = open("./mapbox_token.py").read().rstrip()
 
     # 1번 df
     df_first = pd.DataFrame(rank_list[0])
@@ -110,11 +113,12 @@ def transportation_facility(request):
 
     return render(request, 'map_show.html', {'TF_mymap1': plot_div1, 'TF_mymap2': plot_div2, 'TF_mymap3': plot_div3})
 
+# 근린시설 지도
 def neighborhood_facility(request):
     # 근린시설 : PARK / MALL
     rank_list = ranking()
     center = [rank_list[0]['coords'], rank_list[1]['coords'], rank_list[2]['coords']]
-    mapboxt = open("C:\workspaces\project_2\Project_Engineering\seoul_bike\seoul_bike\mapbox_token.py").read().rstrip()
+    mapboxt = open("./mapbox_token.py").read().rstrip()
 
     # 1번 df
     df_first = pd.DataFrame(rank_list[0])
@@ -163,11 +167,12 @@ def neighborhood_facility(request):
 
     return render(request, 'map_show2.html', {'NF_mymap1': plot_div1, 'NF_mymap2': plot_div2, 'NF_mymap3': plot_div3})
 
+# 교육/문화시설 지도
 def education_facility(request):
     # 교육/문화 : SCHOOL / TOUR_PLACE / CULTURE_PLACE / EVENT_PLACE
     rank_list = ranking()
     center = [rank_list[0]['coords'], rank_list[1]['coords'], rank_list[2]['coords']]
-    mapboxt = open("C:\workspaces\project_2\Project_Engineering\seoul_bike\seoul_bike\mapbox_token.py").read().rstrip()
+    mapboxt = open("./mapbox_token.py").read().rstrip()
 
     # 1번 df
     df_first = pd.DataFrame(rank_list[0])

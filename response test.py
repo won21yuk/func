@@ -1,6 +1,5 @@
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl import Search, Q
-from django.http import JsonResponse
 
 def elastic_client_set():
     # elasticsearch와 연결
@@ -14,6 +13,7 @@ def elastic_client_set():
 
     # 1주일 간의 데이터로 시간 범위 설정
     s = Search.from_dict(body).filter("range", **{"@timestamp": {"gte": "now-7d", "lte": "now"}})
+    # 로그 파이프 라인으로 수집한 검색 기업 데이터 사용
     s = s.index("targetlog-*")
     s = s.doc_type("target_log")
 
@@ -36,7 +36,7 @@ print(favorite_job_lst)
 
 
 # 1. elasticsearch와 연결
-client = connections.create_connection(hosts=['http://220.86.100.9:9200'], http_auth=('elastic', 'votmdnjem'))
+client = connections.create_connection(hosts=['http://{ip}:9200'], http_auth=('es-id', 'es-pw'))
 s = Search(using=client)
 
 # 2. job과 일치하는 값들만 필터링

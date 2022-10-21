@@ -14,7 +14,7 @@ def search_company(request):
         req_corp_nm = request.POST.get('corp_nm', False)
         logging_search(request, req_corp_nm)
 
-        client = connections.create_connection(hosts=['http://220.86.100.9:9200'], http_auth=('elastic', 'votmdnjem'))
+        client = connections.create_connection(hosts=['http://{ip}:9200'], http_auth=('es-id', 'es-pw'))
         s = Search(using=client)
         s = s.index("corp_total_info")
         q = Q("multi_match", query=keyword, fields=["corp_nm", "corp_nm_eng"])

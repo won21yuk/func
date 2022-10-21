@@ -1,6 +1,5 @@
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl import Search, Q
-from django.http import JsonResponse
 
 def elastic_client_set():
     # elasticsearch와 연결

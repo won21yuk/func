@@ -5,8 +5,8 @@ from elasticsearch import Elasticsearch
 import pandas as pd
 
 def _search_engine(keyword):
-    es = Elasticsearch("http://{ip}.9:9200", http_auth=("es-id", "es-pw"))
-
+    es = Elasticsearch("http://{ip}:9200", http_auth=("es-id", "es-pw"))
+    # 기업명으로 검색
     resp2 = es.search(index="corp_total_info", query={"match_phrase": {"corp_nm": keyword}})
     search_list = resp2['hits']['hits']
 

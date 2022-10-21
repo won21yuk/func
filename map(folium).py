@@ -34,7 +34,7 @@ class ClickForOneMarker(folium.ClickForMarker):
 
 # 반경안에 마커 그리는 클래스
 class MappingByCoord:
-
+    # 인자로 받는 값 : 데이터프레임, 위도, 경도, 반경(km)
     def __init__(self, df, lat, lng, dist=5):
 
         self.df = df
@@ -164,32 +164,35 @@ class MappingByCoord:
 
 # 맵을 그리는 메서드(iframe 형태로 template에 전달)
 def makeMap(request):
+    # geocoder로 ip 출력하여 좌표값으로 변환
     user_loc = geocoder.ip('me')
     mylocation = user_loc.latlng
-
-    cfom = ClickForOneMarker()
 
     lat = mylocation[0]
     lng = mylocation[1]
     dist = 5
 
+    # models에서 정신의료시설 데이터 가져오기
     df = pd.DataFrame(list(MentalServiceLocation.objects.all().values()))
 
+    # 반경 내 좌표값 필터링을 위한 인스턴스 생성
     mbc = MappingByCoord(df, lat, lng, dist)
 
     result_radius = mbc.setCircle()
 
     mymap = mbc.MappingInCircle(result_radius)
+    # 내 현재 위치 마커로 표시
     folium.Marker(location=mylocation, popup='현재 나의 위치', icon=folium.Icon(color='red', icon='star')).add_to(mymap)
     plugins.LocateControl().add_to(mymap)
     plugins.Geocoder(position='bottomright', collapsed=True, add_marker=True).add_to(mymap)
 
+    # 카테고리별로 마커를 컨트롤 할 수 있는 layer 생성
     folium.LayerControl(collapsed=True, position='bottomright').add_to(mymap)
     mymap.add_child(cfom)
 
     mymap.layer_name = '구분'
-    mymap
 
+    # iframe으로 지도 생성
     maps = mymap._repr_html_()
     return render(request, 'map_show.html', {'mymap': maps})
 

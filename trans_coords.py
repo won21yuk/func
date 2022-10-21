@@ -11,7 +11,7 @@ row_num = int(len(df))
 for i in range(row_num):
     location = df['주소1'][i]
     url = f"https://dapi.kakao.com/v2/local/search/keyword.json?query={location}"
-    kakao_key = "eeb4d25bd0990160503da341e8678475"
+    kakao_key = "#"
     result = requests.get(url, headers={"Authorization": f"KakaoAK {kakao_key}"})
     json_obj = result.json()
 
@@ -33,7 +33,7 @@ df['동코드'] = ""
 # 동코드 삽입
 dong_cd = list()
 for x, y in zip(df['경도'], df['위도']):
-    kakao_key = "eeb4d25bd0990160503da341e8678475"
+    kakao_key = "#"
     url = f'https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x={x}&y={y}'
     try:
         resp = requests.get(url, headers={"Authorization" : f"KakaoAK {kakao_key}"})
